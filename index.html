@@ -263,7 +263,10 @@ async function analyze() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ shimei: shimei, career: career })
     });
-    var data = await resp.json();
+    var rawText = await resp.text();
+    var data;
+    try { data = JSON.parse(rawText); }
+    catch(e) { throw new Error('サーバー生エラー: ' + rawText.slice(0, 200)); }
     if (data.error) throw new Error(data.error);
     document.getElementById('resultBody').innerHTML =
       '<div class="result-body">' + data.result.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>';
