@@ -145,8 +145,12 @@
 function markdownToHtml(text) {
   // 連続3行以上の空行を2行に圧縮
   text = text.replace(/\n{3,}/g, '\n\n');
-  // 箇条書き行どうしの間の空行を除去
-  text = text.replace(/^(\s*[-*・]\s+.+)\n\n(?=\s*[-*・]\s)/gm, '$1\n');
+  // 箇条書き行どうしの間の空行を繰り返し除去
+  for (var _i = 0; _i < 5; _i++) {
+    var _prev = text;
+    text = text.replace(/([ \t]*[-*・][ \t]+[^\n]+)\n\n([ \t]*[-*・][ \t])/g, '$1\n$2');
+    if (text === _prev) break;
+  }
   // テーブル変換
   text = text.replace(/^\|(.+)\|\n\|[-|\s:]+\|\n((?:\|.+\|\n?)*)/gm, function(m, header, rows) {
     var ths = header.split('|').map(function(s){return s.trim();}).filter(Boolean)
@@ -180,6 +184,8 @@ function markdownToHtml(text) {
   text = text.replace(/(<li>[\s\S]*?<\/li>\n?)+/g, function(m){
     return '<ul>'+m+'</ul>';
   });
+  // 隣接するulブロックを結合（空行で分離されたリストを統合）
+  text = text.replace(/<\/ul>\s*<ul>/g, '');
   // 段落処理
   text = text.split('\n\n').map(function(para){
     para = para.trim();
