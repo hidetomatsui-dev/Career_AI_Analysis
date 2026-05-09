@@ -1,36 +1,50 @@
 export const config = { runtime: 'edge' };
 
 function markdownToHtml(text) {
-  return text
-    // コードブロック（```）を除去
-    .replace(/```[\s\S]*?```/g, '')
-    // --- 区切り線
-    .replace(/^---+$/gm, '<hr style="border:none;border-top:1px solid #e0ddd8;margin:20px 0;">')
-    // ## 見出し2
-    .replace(/^## (.+)$/gm, '<h2 style="font-size:16px;font-weight:600;color:#1a1917;margin:28px 0 10px;padding-bottom:6px;border-bottom:1px solid #f0ede8;">$1</h2>')
-    // ### 見出し3
-    .replace(/^### (.+)$/gm, '<h3 style="font-size:14px;font-weight:600;color:#3a3835;margin:20px 0 8px;">$1</h3>')
-    // #### 見出し4
-    .replace(/^#### (.+)$/gm, '<h4 style="font-size:13px;font-weight:600;color:#3a3835;margin:16px 0 6px;">$1</h4>')
-    // ■ セクション見出し
-    .replace(/^■ (.+)$/gm, '<h2 style="font-size:16px;font-weight:600;color:#1a1917;margin:28px 0 10px;padding-bottom:6px;border-bottom:2px solid #e0ddd8;">■ $1</h2>')
-    // **太字**
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    // *斜体*
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // - 箇条書き
-    .replace(/^[-・] (.+)$/gm, '<li style="margin:5px 0;line-height:1.7;">$1</li>')
-    // 番号付きリスト
-    .replace(/^\d+\. (.+)$/gm, '<li style="margin:6px 0;line-height:1.7;">$1</li>')
-    // <li>をulで囲む（連続するliをグループ化）
-    .replace(/(<li[^>]*>.*<\/li>\n?)+/g, (m) => `<ul style="margin:8px 0;padding-left:20px;">${m}</ul>`)
-    // 空行を段落に
-    .replace(/\n\n/g, '</p><p style="margin:8px 0;line-height:1.8;">')
-    // 残りの改行
-    .replace(/\n/g, '<br>')
-    // 全体をpで囲む
-    .replace(/^(.)/,'<p style="margin:8px 0;line-height:1.8;">$1')
-    .replace(/(.)$/,'$1</p>');
+  // テーブル変換（最初に処理）
+  text = text.replace(/^\|(.+)\|\n\|[-|\s:]+\|\n((?:\|.+\|\n?)*)/gm, function(match, header, rows) {
+    var thStyle = 'padding:8px 12px;background:#f2f0ec;font-weight:600;font-size:12px;text-align:left;border:1px solid #ddd;';
+    var tdStyle = 'padding:8px 12px;font-size:13px;border:1px solid #e0ddd8;line-height:1.6;vertical-align:top;';
+    var headerCells = header.split('|').map(function(s){ return s.trim(); }).filter(Boolean);
+    var headerHtml = headerCells.map(function(c){ return '<th style="'+thStyle+'">'+c+'</th>'; }).join('');
+    var rowLines = rows.trim().split('\n').filter(Boolean);
+    var rowsHtml = rowLines.map(function(row){
+      var cells = row.split('|').map(function(s){ return s.trim(); }).filter(Boolean);
+      return '<tr>'+cells.map(function(c){ return '<td style="'+tdStyle+'">'+c+'</td>'; }).join('')+'</tr>';
+    }).join('');
+    return '<table style="width:100%;border-collapse:collapse;margin:12px 0;">'+
+      '<thead><tr>'+headerHtml+'</tr></thead><tbody>'+rowsHtml+'</tbody></table>';
+  });
+  // コードブロック除去
+  text = text.replace(/```[\s\S]*?```/g, '');
+  // --- 区切り線
+  text = text.replace(/^---+$/gm, '<hr style="border:none;border-top:1px solid #e0ddd8;margin:14px 0;">');
+  // ■ ## 見出し
+  text = text.replace(/^## ■ (.+)$/gm, '<h2 style="font-size:15px;font-weight:700;color:#1a1917;margin:20px 0 7px;padding-bottom:5px;border-bottom:2px solid #e0ddd8;">■ $1</h2>');
+  text = text.replace(/^## (.+)$/gm, '<h2 style="font-size:15px;font-weight:700;color:#1a1917;margin:20px 0 7px;padding-bottom:4px;border-bottom:1px solid #e0ddd8;">$1</h2>');
+  text = text.replace(/^■ (.+)$/gm, '<h2 style="font-size:15px;font-weight:700;color:#1a1917;margin:20px 0 7px;padding-bottom:5px;border-bottom:2px solid #e0ddd8;">■ $1</h2>');
+  // ### 見出し3
+  text = text.replace(/^### (.+)$/gm, '<h3 style="font-size:13px;font-weight:700;color:#3a3835;margin:14px 0 4px;">$1</h3>');
+  // #### 見出し4
+  text = text.replace(/^#### (.+)$/gm, '<h4 style="font-size:13px;font-weight:600;color:#5a5855;margin:9px 0 3px;">$1</h4>');
+  // **太字**
+  text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  // *斜体*
+  text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  // 番号付きリスト
+  text = text.replace(/^\d+\. (.+)$/gm, '<li style="margin:3px 0;line-height:1.6;">$1</li>');
+  // 箇条書き
+  text = text.replace(/^[-・] ?(.+)$/gm, '<li style="margin:3px 0;line-height:1.6;">$1</li>');
+  // liをulで囲む
+  text = text.replace(/(<li[^>]*>[\s\S]*?<\/li>\n?)+/g, function(m){ return '<ul style="margin:5px 0;padding-left:18px;">'+m+'</ul>'; });
+  // 空行を段落に
+  text = text.split('\n\n').map(function(para){
+    para = para.trim();
+    if (!para) return '';
+    if (para.match(/^<[hHutpd]/)) return para;
+    return '<p style="margin:4px 0;line-height:1.6;">'+para.replace(/\n/g,'<br>')+'</p>';
+  }).join('\n');
+  return text;
 }
 
 export default async function handler(req) {
