@@ -31,12 +31,14 @@ function markdownToHtml(text) {
   text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   // *斜体*
   text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  // 空の箇条書き行を除去
+  text = text.replace(/^\* *$/gm, '');
   // 番号付きリスト
-  text = text.replace(/^\d+\. (.+)$/gm, '<li style="margin:3px 0;line-height:1.6;">$1</li>');
+  text = text.replace(/^\d+\. (.+)$/gm, '<li style="margin:2px 0;line-height:1.55;">$1</li>');
   // 箇条書き
-  text = text.replace(/^[-・] ?(.+)$/gm, '<li style="margin:3px 0;line-height:1.6;">$1</li>');
+  text = text.replace(/^[-・\\*] ?(.+)$/gm, '<li style="margin:2px 0;line-height:1.55;">$1</li>');
   // liをulで囲む
-  text = text.replace(/(<li[^>]*>[\s\S]*?<\/li>\n?)+/g, function(m){ return '<ul style="margin:5px 0;padding-left:18px;">'+m+'</ul>'; });
+  text = text.replace(/(<li[^>]*>[\s\S]*?<\/li>\n?)+/g, function(m){ return '<ul style="margin:3px 0;padding-left:18px;">'+m+'</ul>'; });
   // 空行を段落に
   text = text.split('\n\n').map(function(para){
     para = para.trim();
