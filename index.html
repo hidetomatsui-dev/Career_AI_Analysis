@@ -273,12 +273,39 @@ async function analyze() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ shimei: shimei, career: career })
     });
-    var data = await resp.json();
-    if (data.error) throw new Error(data.error);
-    var resultText = data.result;
+    if (!resp.ok || !resp.body) {
+      var errText = await resp.text();
+      throw new Error(errText.slice(0, 200));
+    }
+    var bodyEl = document.createElement('div');
+    bodyEl.className = 'result-body';
+    document.getElementById('resultBody').innerHTML = '';
+    document.getElementById('resultBody').appendChild(bodyEl);
+    var reader = resp.body.getReader();
+    var decoder = new TextDecoder();
+    var resultText = '';
+    var buf = '';
+    while (true) {
+      var rd = await reader.read();
+      if (rd.done) break;
+      buf += decoder.decode(rd.value, { stream: true });
+      var lines = buf.split('\n');
+      buf = lines.pop();
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i].trim();
+        if (!line.startsWith('data: ')) continue;
+        var js = line.slice(6);
+        if (js === '[DONE]') continue;
+        try {
+          var parsed = JSON.parse(js);
+          if (parsed.type === 'content_block_delta' && parsed.delta && parsed.delta.text) {
+            resultText += parsed.delta.text;
+            bodyEl.textContent = resultText;
+          }
+        } catch(pe) {}
+      }
+    }
     window._lastResult = resultText;
-    document.getElementById('resultBody').innerHTML =
-      '<div class="result-body">' + resultText.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>';
     document.getElementById('emailSection').style.display = '';
   } catch(e) {
     document.getElementById('resultBody').innerHTML =
