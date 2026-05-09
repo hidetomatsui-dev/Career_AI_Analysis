@@ -2,7 +2,11 @@ export const config = { runtime: 'edge' };
 
 function markdownToHtml(text) {
   text = text.replace(/\n{3,}/g, '\n\n');
-  text = text.replace(/^(\s*[-*・]\s+.+)\n\n(?=\s*[-*・]\s)/gm, '$1\n');
+  for (var _i = 0; _i < 5; _i++) {
+    var _prev = text;
+    text = text.replace(/([ \t]*[-*・][ \t]+[^\n]+)\n\n([ \t]*[-*・][ \t])/g, '$1\n$2');
+    if (text === _prev) break;
+  }
   text = text.replace(/^\|(.+)\|\n\|[-|\s:]+\|\n((?:\|.+\|\n?)*)/gm, function(m, header, rows) {
     var thS = 'padding:8px 12px;background:#f2f0ec;font-weight:600;font-size:12px;text-align:left;border:1px solid #ddd;';
     var tdS = 'padding:8px 12px;font-size:13px;border:1px solid #e0ddd8;line-height:1.6;vertical-align:top;';
@@ -29,6 +33,7 @@ function markdownToHtml(text) {
   text = text.replace(/(<li[^>]*>[\s\S]*?<\/li>\n?)+/g, function(m){
     return '<ul style="margin:3px 0;padding-left:18px;">'+m+'</ul>';
   });
+  text = text.replace(/<\/ul>\s*<ul[^>]*>/g, '');
   text = text.split('\n\n').map(function(para){
     para = para.trim();
     if (!para) return '';
