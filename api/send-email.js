@@ -1,165 +1,16 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>職業適性 AI アナライザー</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg: #faf9f7; --bg2: #f2f0ec; --bg3: #fff;
-    --text: #1a1917; --text2: #6b6860; --text3: #9c9a95;
-    --border: rgba(0,0,0,0.1); --border2: rgba(0,0,0,0.2);
-    --success: #2d7d4f; --danger: #c0392b;
-    --radius: 12px; --radius-sm: 8px;
-  }
-  body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 2rem 1rem; }
-  .app { max-width: 680px; margin: 0 auto; }
-
-  .header { text-align: center; padding: 2rem; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 1.5rem; }
-  .header-badge { display: inline-block; font-size: 10px; letter-spacing: 3px; color: var(--text3); border: 1px solid var(--border); border-radius: 20px; padding: 4px 14px; margin-bottom: 12px; }
-  .header h1 { font-family: 'Noto Serif JP', serif; font-size: 22px; font-weight: 400; letter-spacing: 3px; }
-  .header p { font-size: 13px; color: var(--text2); margin-top: 10px; line-height: 1.8; }
-
-  .steps { display: flex; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 1.5rem; }
-  .step { flex: 1; padding: 12px 8px; text-align: center; font-size: 12px; color: var(--text3); border-right: 1px solid var(--border); }
-  .step:last-child { border-right: none; }
-  .step .sn { display: block; font-size: 10px; letter-spacing: 1px; margin-bottom: 3px; opacity: 0.7; }
-  .step.active { color: var(--text); background: var(--bg2); font-weight: 500; }
-  .step.done { color: var(--success); }
-
-  .card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
-  .card-title { font-size: 15px; font-weight: 500; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
-  .card-sub { font-size: 12px; color: var(--text2); margin-bottom: 1rem; line-height: 1.7; }
-
-  .source-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; padding: 5px 12px; border: 1px solid var(--border2); border-radius: 20px; background: var(--bg2); color: var(--text2); margin-bottom: 10px; }
-  .source-badge a { color: inherit; text-decoration: none; }
-  .source-badge a:hover { text-decoration: underline; }
-
-  .tip { background: var(--bg2); border-left: 3px solid var(--border2); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 10px 14px; font-size: 12px; color: var(--text2); margin-bottom: 1rem; line-height: 1.7; }
-  .tip b { color: var(--text); }
-
-  .sample-btn { font-size: 11px; padding: 5px 12px; border: 1px solid var(--border2); border-radius: 20px; background: var(--bg2); color: var(--text2); cursor: pointer; margin-bottom: 10px; display: inline-block; transition: all 0.15s; }
-  .sample-btn:hover { color: var(--text); border-color: var(--text); }
-
-  textarea { width: 100%; font-family: 'Noto Sans JP', sans-serif; font-size: 12.5px; line-height: 1.8; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); color: var(--text); resize: vertical; outline: none; transition: border-color 0.15s; }
-  textarea:focus { border-color: var(--border2); background: var(--bg3); }
-  .char-count { font-size: 11px; color: var(--text3); text-align: right; margin-top: 4px; }
-
-  .btn-row { display: flex; gap: 8px; }
-  .btn { padding: 13px 20px; border-radius: var(--radius-sm); font-family: 'Noto Sans JP', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: opacity 0.2s, background 0.15s; border: 1px solid var(--border); }
-  .btn-back { background: var(--bg2); color: var(--text); flex: 0 0 80px; }
-  .btn-back:hover { background: var(--bg); }
-  .btn-next { background: var(--text); color: var(--bg3); flex: 1; border-color: transparent; }
-  .btn-next:hover { opacity: 0.85; }
-  .btn-reset { background: var(--bg2); color: var(--text); width: 100%; }
-
-  .error-msg { font-size: 13px; color: var(--danger); padding: 10px 14px; border: 1px solid rgba(192,57,43,0.3); border-radius: var(--radius-sm); margin-top: 10px; }
-
-  .result-wrap { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 1rem; }
-  .result-head { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
-  .result-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--bg2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px; }
-  .result-h { font-family: 'Noto Serif JP', serif; font-size: 16px; font-weight: 400; letter-spacing: 1px; }
-  .result-meta { font-size: 12px; color: var(--text3); margin-top: 2px; }
-  .result-body { padding: 1.25rem 1.5rem; font-size: 13.5px; line-height: 1.6; color: var(--text); }
-
-  .loading-box { padding: 3rem; display: flex; flex-direction: column; align-items: center; gap: 16px; color: var(--text2); font-size: 13px; }
-  .spinner { width: 30px; height: 30px; border: 2px solid var(--border2); border-top-color: var(--text2); border-radius: 50%; animation: spin 0.8s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .hidden { display: none; }
-</style>
-</head>
-<body>
-<div class="app">
-
-  <div class="header">
-    <div class="header-badge">四柱推命 × キャリアレポート</div>
-    <h1>職業適性 AI アナライザー</h1>
-    <p>「お仕事占い 天命レポート」と「マイキャリアレポート」を<br>貼り付けるだけで、AIが職業適性を総合分析します</p>
-  </div>
-
-  <div class="steps">
-    <div class="step active" id="sp0"><span class="sn">STEP 1</span>天命レポート</div>
-    <div class="step" id="sp1"><span class="sn">STEP 2</span>キャリアレポート</div>
-    <div class="step" id="sp2"><span class="sn">STEP 3</span>AI 分析結果</div>
-  </div>
-
-  <!-- STEP 0 -->
-  <div id="s0">
-    <div class="card">
-      <div class="card-title">&#9728; お仕事占い ─ 四柱推命 天命レポート</div>
-      <div class="card-sub">メールで受け取った「天命レポート」の本文をそのまま全文貼り付けてください。</div>
-      <div class="source-badge">
-        &#128279; 占いサービス：<a href="https://shimeibo-app.vercel.app" target="_blank">shimeibo-app.vercel.app</a>
-      </div>
-      <div class="tip"><b>こんな情報が含まれていると分析が深まります：</b><br>天命タイプ、核心的な強み、働き方の傾向、向いている仕事のフィールド、やりがいの源泉など</div>
-      <button class="sample-btn" onclick="fillSample('shimei')">✦ サンプルを入力する（ひでとさんの例）</button>
-      <textarea id="shimeiTxt" rows="18" oninput="countChars('shimei')" placeholder="━━━━━━━━━━━━━━━━━━━━━━&#10;お仕事占い ─ 四柱推命 天命レポート&#10;━━━━━━━━━━━━━━━━━━━━━━&#10;&#10;...ここにメールの本文を貼り付けてください..."></textarea>
-      <div class="char-count" id="shimeiCount">0 文字</div>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-next" onclick="toStep1()">次へ → キャリアレポートを入力</button>
-    </div>
-    <div id="err0"></div>
-  </div>
-
-  <!-- STEP 1 -->
-  <div id="s1" class="hidden">
-    <div class="card">
-      <div class="card-title">&#128196; マイキャリアレポート</div>
-      <div class="card-sub">職業興味（RIASEC）と価値観の分析アプリで生成されたレポートを全文貼り付けてください。</div>
-      <button class="sample-btn" onclick="fillSample('career')">✦ サンプルを入力する</button>
-      <textarea id="careerTxt" rows="22" oninput="countChars('career')" placeholder="◆ マイキャリアレポート&#10;...ここにレポート全文を貼り付けてください..."></textarea>
-      <div class="char-count" id="careerCount">0 文字</div>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-back" onclick="toStep0()">&#8592; 戻る</button>
-      <button class="btn btn-next" onclick="analyze()">AI で総合分析する &#8594;</button>
-    </div>
-    <div id="err1"></div>
-  </div>
-
-  <!-- STEP 2 -->
-  <div id="s2" class="hidden">
-    <div class="result-wrap">
-      <div class="result-head">
-        <div class="result-icon">&#128202;</div>
-        <div>
-          <div class="result-h">総合 職業適性レポート</div>
-          <div class="result-meta" id="reportDate"></div>
-        </div>
-      </div>
-      <div id="resultBody">
-        <div class="loading-box">
-          <div class="spinner"></div>
-          <div>天命レポートとキャリアデータを統合分析しています...</div>
-        </div>
-      </div>
-    </div>
-    <!-- メール送信 -->
-    <div id="emailSection" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;display:none;">
-      <div style="font-size:14px;font-weight:500;margin-bottom:4px;">    <button class="btn btn-reset" onclick="resetAll()">もう一度分析する</button>📧 分析結果をメールで受け取る</div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:12px;">送信先のメールアドレスを入力してください</div>
-      <div style="display:flex;gap:8px;">
-        <input type="email" id="emailInput" placeholder="your@email.com" style="flex:1;padding:11px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;background:var(--bg);color:var(--text);outline:none;">
-        <button class="btn btn-next" style="flex:0 0 auto;padding:11px 20px;font-size:13px;" onclick="sendEmail()">送信</button>
-      </div>
-      <div id="emailMsg" style="margin-top:8px;font-size:12px;"></div>
-    </div>
-    <button class="btn btn-reset" onclick="resetAll()">もう一度分析する</button>
-  </div>
-
-</div>
-<script>
+export const config = { runtime: 'edge' };
 
 function markdownToHtml(text) {
   // 連続する空行を1行に圧縮
   text = text.replace(/\n{3,}/g, '\n\n');
-  // テーブル変換
+  // 箇条書き行間の空行を除去（AIが
+
+を挿入する問題対策）
+  text = text.replace(/(^\s*[\*\-・]\s+.+)\n\n(?=\s*[\*\-・])/gm, '$1\n');
+  // テーブル変換（最初に処理）
   text = text.replace(/^\|(.+)\|\n\|[-|\s:]+\|\n((?:\|.+\|\n?)*)/gm, function(match, header, rows) {
-    var thStyle = 'padding:7px 11px;background:#f2f0ec;font-weight:600;font-size:12px;text-align:left;border:1px solid #ddd;';
-    var tdStyle = 'padding:7px 11px;font-size:13px;border:1px solid #e0ddd8;line-height:1.6;';
+    var thStyle = 'padding:8px 12px;background:#f2f0ec;font-weight:600;font-size:12px;text-align:left;border:1px solid #ddd;';
+    var tdStyle = 'padding:8px 12px;font-size:13px;border:1px solid #e0ddd8;line-height:1.6;vertical-align:top;';
     var headerCells = header.split('|').map(function(s){ return s.trim(); }).filter(Boolean);
     var headerHtml = headerCells.map(function(c){ return '<th style="'+thStyle+'">'+c+'</th>'; }).join('');
     var rowLines = rows.trim().split('\n').filter(Boolean);
@@ -167,22 +18,34 @@ function markdownToHtml(text) {
       var cells = row.split('|').map(function(s){ return s.trim(); }).filter(Boolean);
       return '<tr>'+cells.map(function(c){ return '<td style="'+tdStyle+'">'+c+'</td>'; }).join('')+'</tr>';
     }).join('');
-    return '<table style="width:100%;border-collapse:collapse;margin:10px 0;">'+
+    return '<table style="width:100%;border-collapse:collapse;margin:12px 0;">'+
       '<thead><tr>'+headerHtml+'</tr></thead><tbody>'+rowsHtml+'</tbody></table>';
   });
+  // コードブロック除去
   text = text.replace(/```[\s\S]*?```/g, '');
-  text = text.replace(/^---+$/gm, '<hr style="border:none;border-top:1px solid #e8e4de;margin:12px 0;">');
+  // --- 区切り線
+  text = text.replace(/^---+$/gm, '<hr style="border:none;border-top:1px solid #e0ddd8;margin:14px 0;">');
+  // ■ ## 見出し
   text = text.replace(/^## ■ (.+)$/gm, '<h2 style="font-size:15px;font-weight:700;color:#1a1917;margin:20px 0 7px;padding-bottom:5px;border-bottom:2px solid #e0ddd8;">■ $1</h2>');
   text = text.replace(/^## (.+)$/gm, '<h2 style="font-size:15px;font-weight:700;color:#1a1917;margin:20px 0 7px;padding-bottom:4px;border-bottom:1px solid #e0ddd8;">$1</h2>');
   text = text.replace(/^■ (.+)$/gm, '<h2 style="font-size:15px;font-weight:700;color:#1a1917;margin:20px 0 7px;padding-bottom:5px;border-bottom:2px solid #e0ddd8;">■ $1</h2>');
-  text = text.replace(/^### (.+)$/gm, '<h3 style="font-size:13px;font-weight:700;color:#3a3835;margin:13px 0 4px;">$1</h3>');
+  // ### 見出し3
+  text = text.replace(/^### (.+)$/gm, '<h3 style="font-size:13px;font-weight:700;color:#3a3835;margin:14px 0 4px;">$1</h3>');
+  // #### 見出し4
   text = text.replace(/^#### (.+)$/gm, '<h4 style="font-size:13px;font-weight:600;color:#5a5855;margin:9px 0 3px;">$1</h4>');
+  // **太字**
   text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  // *斜体*
   text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
-  text = text.replace(/^\s*[\*-]\s*$/gm, '');  // 空の箇条書き行を除去（インデント付きも）
+  // 空の箇条書き行を除去
+  text = text.replace(/^\s*[\*-]\s*$/gm, '');  // 空の箇条書き行を除去
+  // 番号付きリスト
   text = text.replace(/^\d+\. (.+)$/gm, '<li style="margin:2px 0;line-height:1.55;">$1</li>');
-  text = text.replace(/^\s*[-・\*]\s+(.+)$/gm, '<li style="margin:2px 0;line-height:1.55;">$1</li>');
+  // 箇条書き
+  text = text.replace(/^\\s*[-・\\*]\\s+(.+)$/gm, '<li style="margin:2px 0;line-height:1.55;">$1</li>');
+  // liをulで囲む
   text = text.replace(/(<li[^>]*>[\s\S]*?<\/li>\n?)+/g, function(m){ return '<ul style="margin:2px 0;padding-left:18px;">'+m+'</ul>'; });
+  // 空行を段落に
   text = text.split('\n\n').map(function(para){
     para = para.trim();
     if (!para) return '';
@@ -192,196 +55,114 @@ function markdownToHtml(text) {
   return text;
 }
 
-const SHIMEI_SAMPLE = `━━━━━━━━━━━━━━━━━━━━━━
-お仕事占い ─ 四柱推命 天命レポート
-━━━━━━━━━━━━━━━━━━━━━━
-■ お名前：ひでと
-■ 生年月日：1967年11月11日
-
-【天命タイプ】
-土の食神タイプ：豊かさを育み、喜びを分かち合う人
-
-【核心的な強み】
-創造性と人を喜ばせる才能
-
-【働き方の傾向】
-のびのびと自分の感性を活かす仕事で輝くエネルギーです。楽しみながら作ることが最大のパフォーマンスにつながります。食・芸術・表現との親和性が高い傾向があります。
-
-【向いている仕事のフィールド】
-  1. 料理人・フードクリエイター
-  2. デザイナー・アーティスト
-  3. コンテンツクリエイター
-  4. 保育士・教育者
-  5. ホスピタリティ業
-  6. 音楽家・俳優
-
-【やりがいの源泉】
-自分の作ったものや表現が人を喜ばせたとき
-
-【自己理解への問いかけ】
-「「遊び」と「仕事」が完全に一致しているとしたら、何をしていますか？」
-━━━━━━━━━━━━━━━━━━━━━━
-お仕事占い https://shimeibo-app.vercel.app
-━━━━━━━━━━━━━━━━━━━━━━`;
-
-const CAREER_SAMPLE = `◆ マイキャリアレポート 2026年4月19日
-──────────────────────────
-【1. 職業興味タイプ (RIASEC)】
-I — 研究的 (Investigative) 調べたり、分析したり、問題を解くことが好き
-スリーレターコード：IAE
-スコア（好き／嫌い）:
-  R 現実: 1点 ／ 9点
-  I 研究: 13点 ／ 1点
-  A 芸術: 13点 ／ 0点
-  S 社会: 5点 ／ 4点
-  E 企業: 7点 ／ 1点
-  C 慣習: 3点 ／ 5点
-──────────────────────────
-【AI による統合分析】
-■ 方向性
-IAE（研究的・芸術的・企業的）という特性に、「美」・「創造性」・「貢献」という価値観を掛け合わせると、単なる「仕事」ではなく「知と美を融合した社会貢献プロデュース」が適しています。
-■ キャリアステートメント
-私は、探求心と分析力を通じて物事の本質を深く理解し、その上で独自の美的センスを活かして新しい価値を創造する者です。常に「美」と「調和」が最も整った状態を追求し、固定観念にとらわれない発想で社会をより豊かにする「創造性」を発揮します。自ら率先して行動し、その活動が「世の中を美しくするための創造的な活動」として、広く「貢献」へと繋がることを目指します。
-■ おすすめ職業
-1. 建築家 — 空間の機能性と美しさを探求し、創造的なデザインを通して人々の生活や社会に貢献できる。
-2. 都市プランナー — 研究分析に基づき、未来の都市像を美的センスで描き、より良い環境創造に貢献する。
-3. クリエイティブディレクター — 調査・分析力と美的感性でプロジェクトを統括し、世の中に新たな価値と感動を届ける。
-──────────────────────────
-【2. TOP 価値観】
-No.1  美    → 最もバランスが整っている状態
-TOP3 #2  創造性    → ちえをしぼり新しく何かを創造することで豊かさが増す
-TOP3 #3  貢献    → 自分らしくありながら世の中の役に立つ
-TOP5 #4  智恵
-TOP5 #5  誠実
-──────────────────────────
-【3. キャリアの軸】
-世の中を美しくするための創造的な活動を通して世の中に貢献する
-──────────────────────────
-【4. アクション宣言】
-Action 1: （未入力）
-Action 2: （未入力）
-Action 3: （未入力）`;
-
-function fillSample(type) {
-  const id = type === 'shimei' ? 'shimeiTxt' : 'careerTxt';
-  document.getElementById(id).value = type === 'shimei' ? SHIMEI_SAMPLE : CAREER_SAMPLE;
-  countChars(type);
-}
-
-function countChars(type) {
-  const id = type === 'shimei' ? 'shimeiTxt' : 'careerTxt';
-  const cid = type === 'shimei' ? 'shimeiCount' : 'careerCount';
-  document.getElementById(cid).textContent = document.getElementById(id).value.length + ' 文字';
-}
-
-function setStep(n) {
-  ['s0','s1','s2'].forEach(function(id, i) {
-    document.getElementById(id).classList.toggle('hidden', i !== n);
-    var sp = document.getElementById('sp' + i);
-    sp.className = 'step' + (i === n ? ' active' : i < n ? ' done' : '');
-  });
-}
-
-function toStep0() { setStep(0); }
-
-function toStep1() {
-  if (!document.getElementById('shimeiTxt').value.trim()) {
-    document.getElementById('err0').innerHTML = '<div class="error-msg">天命レポートを入力してください</div>';
-    return;
-  }
-  document.getElementById('err0').innerHTML = '';
-  setStep(1);
-}
-
-async function analyze() {
-  var shimei = document.getElementById('shimeiTxt').value.trim();
-  var career = document.getElementById('careerTxt').value.trim();
-  if (!career) {
-    document.getElementById('err1').innerHTML = '<div class="error-msg">キャリアレポートを入力してください</div>';
-    return;
-  }
-  document.getElementById('err1').innerHTML = '';
-  setStep(2);
-
-  var now = new Date();
-  document.getElementById('reportDate').textContent =
-    now.getFullYear() + '年' + (now.getMonth()+1) + '月' + now.getDate() + '日 生成';
-
-  try {
-    var resp = await fetch('/api/analyze', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ shimei: shimei, career: career })
+export default async function handler(req) {
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405, headers: { 'Content-Type': 'application/json' },
     });
-    if (!resp.ok || !resp.body) {
-      var errText = await resp.text();
-      throw new Error(errText.slice(0, 200));
-    }
-    var bodyEl = document.createElement('div');
-    bodyEl.className = 'result-body';
-    document.getElementById('resultBody').innerHTML = '';
-    document.getElementById('resultBody').appendChild(bodyEl);
-    var reader = resp.body.getReader();
-    var decoder = new TextDecoder();
-    var resultText = '';
-    var buf = '';
-    while (true) {
-      var rd = await reader.read();
-      if (rd.done) break;
-      buf += decoder.decode(rd.value, { stream: true });
-      var lines = buf.split('\n');
-      buf = lines.pop();
-      for (var i = 0; i < lines.length; i++) {
-        var line = lines[i].trim();
-        if (!line.startsWith('data: ')) continue;
-        var js = line.slice(6);
-        if (js === '[DONE]') continue;
-        try {
-          var parsed = JSON.parse(js);
-          if (parsed.type === 'content_block_delta' && parsed.delta && parsed.delta.text) {
-            resultText += parsed.delta.text;
-            bodyEl.innerHTML = markdownToHtml(resultText);
-          }
-        } catch(pe) {}
-      }
-    }
-    window._lastResult = resultText;
-    document.getElementById('emailSection').style.display = '';
-  } catch(e) {
-    document.getElementById('resultBody').innerHTML =
-      '<div class="error-msg" style="margin:1.5rem">分析中にエラーが発生しました：' + e.message + '</div>';
   }
-}
 
-async function sendEmail() {
-  var to = document.getElementById('emailInput').value.trim();
-  var msgEl = document.getElementById('emailMsg');
-  if (!to) { msgEl.style.color = 'var(--danger)'; msgEl.textContent = 'メールアドレスを入力してください'; return; }
-  if (!window._lastResult) { msgEl.style.color = 'var(--danger)'; msgEl.textContent = '分析結果がありません'; return; }
-  msgEl.style.color = 'var(--text2)'; msgEl.textContent = '送信中...';
+  let to, subject, result;
   try {
-    var resp = await fetch('/api/send-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ to: to, result: window._lastResult, subject: '職業適性 AI 分析レポート' })
+    const body = await req.json();
+    to = body.to;
+    subject = body.subject || '職業適性 AI 分析レポート';
+    result = body.result;
+  } catch (e) {
+    return new Response(JSON.stringify({ error: 'リクエストエラー' }), {
+      status: 400, headers: { 'Content-Type': 'application/json' },
     });
-    var data = await resp.json();
-    if (data.error) throw new Error(data.error);
-    msgEl.style.color = 'var(--success)'; msgEl.textContent = '✓ ' + to + ' に送信しました';
-  } catch(e) {
-    msgEl.style.color = 'var(--danger)'; msgEl.textContent = '送信エラー：' + e.message;
   }
-}
 
-function resetAll() {
-  ['shimeiTxt','careerTxt'].forEach(function(id){ document.getElementById(id).value = ''; });
-  ['shimeiCount','careerCount'].forEach(function(id){ document.getElementById(id).textContent = '0 文字'; });
-  document.getElementById('emailSection').style.display = 'none';
-  document.getElementById('emailInput').value = '';
-  document.getElementById('emailMsg').textContent = '';
-  window._lastResult = null;
-  setStep(0);
-}
-</script>
+  if (!to || !result) {
+    return new Response(JSON.stringify({ error: 'メールアドレスまたは分析結果が不足しています' }), {
+      status: 400, headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  const htmlContent = markdownToHtml(result);
+
+  const htmlBody = `<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0;padding:0;background:#faf9f7;font-family:'Helvetica Neue',Arial,'Hiragino Sans',sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#faf9f7;padding:40px 16px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+
+        <!-- ヘッダー -->
+        <tr><td style="background:#1a1917;border-radius:12px 12px 0 0;padding:32px;text-align:center;">
+          <p style="margin:0 0 8px;font-size:11px;letter-spacing:4px;color:#9c9a95;text-transform:uppercase;">四柱推命 × キャリアレポート</p>
+          <h1 style="margin:0;font-size:22px;font-weight:300;color:#ffffff;letter-spacing:2px;">職業適性 AI アナライザー</h1>
+          <p style="margin:12px 0 0;font-size:12px;color:#9c9a95;">総合 職業適性レポート</p>
+        </td></tr>
+
+        <!-- リード文 -->
+        <tr><td style="background:#ffffff;padding:28px 32px 16px;border-left:1px solid #e8e4de;border-right:1px solid #e8e4de;">
+          <p style="margin:0;font-size:13px;color:#6b6860;line-height:1.8;">
+            四柱推命の天命レポートとキャリアレポートを統合した、あなたの職業適性 AI 分析レポートをお届けします。
+          </p>
+        </td></tr>
+
+        <!-- 本文 -->
+        <tr><td style="background:#ffffff;padding:8px 32px 32px;border-left:1px solid #e8e4de;border-right:1px solid #e8e4de;font-size:13.5px;color:#1a1917;line-height:1.8;">
+          ${htmlContent}
+        </td></tr>
+
+        <!-- フッター -->
+        <tr><td style="background:#f2f0ec;border-radius:0 0 12px 12px;padding:20px 32px;border:1px solid #e8e4de;border-top:none;">
+          <p style="margin:0;font-size:11px;color:#9c9a95;text-align:center;line-height:1.8;">
+            このメールは <a href="https://career-ai-analysis.vercel.app" style="color:#6b6860;text-decoration:none;">職業適性 AI アナライザー</a> から送信されました。<br>
+            お仕事占い：<a href="https://shimeibo-app.vercel.app" style="color:#6b6860;text-decoration:none;">shimeibo-app.vercel.app</a>
+          </p>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
 </body>
-</html>
+</html>`;
+
+  try {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: 'Career AI <onboarding@resend.dev>',
+        to: [to],
+        subject: subject,
+        html: htmlBody,
+      }),
+    });
+
+    const rawText = await response.text();
+    let data;
+    try { data = JSON.parse(rawText); }
+    catch (e) {
+      return new Response(JSON.stringify({ error: 'メール送信エラー: ' + rawText.slice(0, 200) }), {
+        status: 500, headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (data.error) {
+      return new Response(JSON.stringify({ error: data.error.message || JSON.stringify(data.error) }), {
+        status: 500, headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200, headers: { 'Content-Type': 'application/json' },
+    });
+
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500, headers: { 'Content-Type': 'application/json' },
+    });
+  }
+}
