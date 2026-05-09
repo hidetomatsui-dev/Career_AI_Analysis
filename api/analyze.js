@@ -60,10 +60,17 @@ ${career}
       }),
     });
 
-    const data = await response.json();
+    const rawText = await response.text();
+
+    let data;
+    try {
+      data = JSON.parse(rawText);
+    } catch (e) {
+      return res.status(500).json({ error: 'APIレスポンスエラー: ' + rawText.slice(0, 300) });
+    }
 
     if (data.error) {
-      return res.status(500).json({ error: data.error.message });
+      return res.status(500).json({ error: data.error.message || JSON.stringify(data.error) });
     }
 
     const text = (data.content || []).map(b => b.text || '').join('').trim();
@@ -72,4 +79,4 @@ ${career}
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
-}
+};
