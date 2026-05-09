@@ -156,6 +156,10 @@
 function markdownToHtml(text) {
   // 連続する空行を1行に圧縮
   text = text.replace(/\n{3,}/g, '\n\n');
+  // 箇条書き行間の空行を除去（AIが
+
+を挿入する問題対策）
+  text = text.replace(/(^\s*[\*\-・]\s+.+)\n\n(?=\s*[\*\-・])/gm, '$1\n');
   // テーブル変換
   text = text.replace(/^\|(.+)\|\n\|[-|\s:]+\|\n((?:\|.+\|\n?)*)/gm, function(match, header, rows) {
     var thStyle = 'padding:7px 11px;background:#f2f0ec;font-weight:600;font-size:12px;text-align:left;border:1px solid #ddd;';
