@@ -1,12 +1,30 @@
-module.exports = async function handler(req, res) {
+export const config = { runtime: 'edge' };
+
+export default async function handler(req) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
-  const { shimei, career } = req.body;
+  let shimei, career;
+  try {
+    const body = await req.json();
+    shimei = body.shimei;
+    career = body.career;
+  } catch (e) {
+    return new Response(JSON.stringify({ error: 'リクエストの読み込みに失敗しました' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 
   if (!shimei || !career) {
-    return res.status(400).json({ error: '入力データが不足しています' });
+    return new Response(JSON.stringify({ error: '入力データが不足しています' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   const prompt = `あなたは四柱推命・キャリア心理学・職業カウンセリングの三分野に精通した専門家です。
@@ -55,7 +73,7 @@ ${career}
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 4000,
+        max_tokens: 2000,
         messages: [{ role: 'user', content: prompt }],
       }),
     });
@@ -66,17 +84,29 @@ ${career}
     try {
       data = JSON.parse(rawText);
     } catch (e) {
-      return res.status(500).json({ error: 'APIレスポンスエラー: ' + rawText.slice(0, 300) });
+      return new Response(JSON.stringify({ error: 'APIレスポンスエラー: ' + rawText.slice(0, 300) }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
     if (data.error) {
-      return res.status(500).json({ error: data.error.message || JSON.stringify(data.error) });
+      return new Response(JSON.stringify({ error: data.error.message || JSON.stringify(data.error) }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
     const text = (data.content || []).map(b => b.text || '').join('').trim();
-    return res.status(200).json({ result: text });
+    return new Response(JSON.stringify({ result: text }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
 
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
-};
+}
