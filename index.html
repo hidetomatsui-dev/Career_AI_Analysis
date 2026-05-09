@@ -62,7 +62,7 @@
   .result-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--bg2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px; }
   .result-h { font-family: 'Noto Serif JP', serif; font-size: 16px; font-weight: 400; letter-spacing: 1px; }
   .result-meta { font-size: 12px; color: var(--text3); margin-top: 2px; }
-  .result-body { padding: 1.5rem; font-size: 13.5px; line-height: 2; color: var(--text); white-space: pre-wrap; }
+  .result-body { padding: 1.25rem 1.5rem; font-size: 13.5px; line-height: 1.6; color: var(--text); }
 
   .loading-box { padding: 3rem; display: flex; flex-direction: column; align-items: center; gap: 16px; color: var(--text2); font-size: 13px; }
   .spinner { width: 30px; height: 30px; border: 2px solid var(--border2); border-top-color: var(--text2); border-radius: 50%; animation: spin 0.8s linear infinite; }
@@ -139,7 +139,7 @@
     </div>
     <!-- メール送信 -->
     <div id="emailSection" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;display:none;">
-      <div style="font-size:14px;font-weight:500;margin-bottom:4px;">    <button class="btn btn-reset" onclick="resetAll()">もう一度分析する</button>#128231; 分析結果をメールで受け取る</div>
+      <div style="font-size:14px;font-weight:500;margin-bottom:4px;">    <button class="btn btn-reset" onclick="resetAll()">もう一度分析する</button>📧 分析結果をメールで受け取る</div>
       <div style="font-size:12px;color:var(--text2);margin-bottom:12px;">送信先のメールアドレスを入力してください</div>
       <div style="display:flex;gap:8px;">
         <input type="email" id="emailInput" placeholder="your@email.com" style="flex:1;padding:11px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;background:var(--bg);color:var(--text);outline:none;">
@@ -152,6 +152,43 @@
 
 </div>
 <script>
+
+function markdownToHtml(text) {
+  // テーブル変換
+  text = text.replace(/^\|(.+)\|\n\|[-|\s:]+\|\n((?:\|.+\|\n?)*)/gm, function(match, header, rows) {
+    var thStyle = 'padding:7px 11px;background:#f2f0ec;font-weight:600;font-size:12px;text-align:left;border:1px solid #ddd;';
+    var tdStyle = 'padding:7px 11px;font-size:13px;border:1px solid #e0ddd8;line-height:1.6;';
+    var headerCells = header.split('|').map(function(s){ return s.trim(); }).filter(Boolean);
+    var headerHtml = headerCells.map(function(c){ return '<th style="'+thStyle+'">'+c+'</th>'; }).join('');
+    var rowLines = rows.trim().split('\n').filter(Boolean);
+    var rowsHtml = rowLines.map(function(row){
+      var cells = row.split('|').map(function(s){ return s.trim(); }).filter(Boolean);
+      return '<tr>'+cells.map(function(c){ return '<td style="'+tdStyle+'">'+c+'</td>'; }).join('')+'</tr>';
+    }).join('');
+    return '<table style="width:100%;border-collapse:collapse;margin:10px 0;">'+
+      '<thead><tr>'+headerHtml+'</tr></thead><tbody>'+rowsHtml+'</tbody></table>';
+  });
+  text = text.replace(/```[\s\S]*?```/g, '');
+  text = text.replace(/^---+$/gm, '<hr style="border:none;border-top:1px solid #e8e4de;margin:12px 0;">');
+  text = text.replace(/^## ■ (.+)$/gm, '<h2 style="font-size:15px;font-weight:700;color:#1a1917;margin:20px 0 7px;padding-bottom:5px;border-bottom:2px solid #e0ddd8;">■ $1</h2>');
+  text = text.replace(/^## (.+)$/gm, '<h2 style="font-size:15px;font-weight:700;color:#1a1917;margin:20px 0 7px;padding-bottom:4px;border-bottom:1px solid #e0ddd8;">$1</h2>');
+  text = text.replace(/^■ (.+)$/gm, '<h2 style="font-size:15px;font-weight:700;color:#1a1917;margin:20px 0 7px;padding-bottom:5px;border-bottom:2px solid #e0ddd8;">■ $1</h2>');
+  text = text.replace(/^### (.+)$/gm, '<h3 style="font-size:13px;font-weight:700;color:#3a3835;margin:13px 0 4px;">$1</h3>');
+  text = text.replace(/^#### (.+)$/gm, '<h4 style="font-size:13px;font-weight:600;color:#5a5855;margin:9px 0 3px;">$1</h4>');
+  text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  text = text.replace(/^\d+\. (.+)$/gm, '<li style="margin:3px 0;line-height:1.6;">$1</li>');
+  text = text.replace(/^[-・] ?(.+)$/gm, '<li style="margin:3px 0;line-height:1.6;">$1</li>');
+  text = text.replace(/(<li[^>]*>[\s\S]*?<\/li>\n?)+/g, function(m){ return '<ul style="margin:5px 0;padding-left:18px;">'+m+'</ul>'; });
+  text = text.split('\n\n').map(function(para){
+    para = para.trim();
+    if (!para) return '';
+    if (para.match(/^<[hHutpd]/)) return para;
+    return '<p style="margin:4px 0;line-height:1.6;">'+para.replace(/\n/g,'<br>')+'</p>';
+  }).join('\n');
+  return text;
+}
+
 const SHIMEI_SAMPLE = `━━━━━━━━━━━━━━━━━━━━━━
 お仕事占い ─ 四柱推命 天命レポート
 ━━━━━━━━━━━━━━━━━━━━━━
@@ -300,7 +337,7 @@ async function analyze() {
           var parsed = JSON.parse(js);
           if (parsed.type === 'content_block_delta' && parsed.delta && parsed.delta.text) {
             resultText += parsed.delta.text;
-            bodyEl.textContent = resultText;
+            bodyEl.innerHTML = markdownToHtml(resultText);
           }
         } catch(pe) {}
       }
