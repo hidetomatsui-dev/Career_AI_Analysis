@@ -16,37 +16,29 @@
   }
   body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 2rem 1rem; }
   .app { max-width: 680px; margin: 0 auto; }
-
   .header { text-align: center; padding: 2rem; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 1.5rem; }
   .header-badge { display: inline-block; font-size: 10px; letter-spacing: 3px; color: var(--text3); border: 1px solid var(--border); border-radius: 20px; padding: 4px 14px; margin-bottom: 12px; }
   .header h1 { font-family: 'Noto Serif JP', serif; font-size: 22px; font-weight: 400; letter-spacing: 3px; }
   .header p { font-size: 13px; color: var(--text2); margin-top: 10px; line-height: 1.8; }
-
   .steps { display: flex; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 1.5rem; }
   .step { flex: 1; padding: 12px 8px; text-align: center; font-size: 12px; color: var(--text3); border-right: 1px solid var(--border); }
   .step:last-child { border-right: none; }
   .step .sn { display: block; font-size: 10px; letter-spacing: 1px; margin-bottom: 3px; opacity: 0.7; }
   .step.active { color: var(--text); background: var(--bg2); font-weight: 500; }
   .step.done { color: var(--success); }
-
   .card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
-  .card-title { font-size: 15px; font-weight: 500; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .card-title { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
   .card-sub { font-size: 12px; color: var(--text2); margin-bottom: 1rem; line-height: 1.7; }
-
   .source-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; padding: 5px 12px; border: 1px solid var(--border2); border-radius: 20px; background: var(--bg2); color: var(--text2); margin-bottom: 10px; }
   .source-badge a { color: inherit; text-decoration: none; }
   .source-badge a:hover { text-decoration: underline; }
-
   .tip { background: var(--bg2); border-left: 3px solid var(--border2); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 10px 14px; font-size: 12px; color: var(--text2); margin-bottom: 1rem; line-height: 1.7; }
   .tip b { color: var(--text); }
-
   .sample-btn { font-size: 11px; padding: 5px 12px; border: 1px solid var(--border2); border-radius: 20px; background: var(--bg2); color: var(--text2); cursor: pointer; margin-bottom: 10px; display: inline-block; transition: all 0.15s; }
   .sample-btn:hover { color: var(--text); border-color: var(--text); }
-
   textarea { width: 100%; font-family: 'Noto Sans JP', sans-serif; font-size: 12.5px; line-height: 1.8; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); color: var(--text); resize: vertical; outline: none; transition: border-color 0.15s; }
   textarea:focus { border-color: var(--border2); background: var(--bg3); }
   .char-count { font-size: 11px; color: var(--text3); text-align: right; margin-top: 4px; }
-
   .btn-row { display: flex; gap: 8px; }
   .btn { padding: 13px 20px; border-radius: var(--radius-sm); font-family: 'Noto Sans JP', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: opacity 0.2s, background 0.15s; border: 1px solid var(--border); }
   .btn-back { background: var(--bg2); color: var(--text); flex: 0 0 80px; }
@@ -54,16 +46,23 @@
   .btn-next { background: var(--text); color: var(--bg3); flex: 1; border-color: transparent; }
   .btn-next:hover { opacity: 0.85; }
   .btn-reset { background: var(--bg2); color: var(--text); width: 100%; }
-
   .error-msg { font-size: 13px; color: var(--danger); padding: 10px 14px; border: 1px solid rgba(192,57,43,0.3); border-radius: var(--radius-sm); margin-top: 10px; }
-
   .result-wrap { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 1rem; }
   .result-head { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
   .result-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--bg2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px; }
   .result-h { font-family: 'Noto Serif JP', serif; font-size: 16px; font-weight: 400; letter-spacing: 1px; }
   .result-meta { font-size: 12px; color: var(--text3); margin-top: 2px; }
   .result-body { padding: 1.25rem 1.5rem; font-size: 13.5px; line-height: 1.6; color: var(--text); }
-
+  .result-body h2 { font-size: 15px; font-weight: 700; margin: 20px 0 7px; padding-bottom: 5px; border-bottom: 2px solid #e0ddd8; }
+  .result-body h3 { font-size: 13px; font-weight: 700; margin: 13px 0 4px; }
+  .result-body h4 { font-size: 13px; font-weight: 600; color: #5a5855; margin: 9px 0 3px; }
+  .result-body p { margin: 4px 0; line-height: 1.6; }
+  .result-body ul { margin: 3px 0; padding-left: 18px; }
+  .result-body li { margin: 2px 0; line-height: 1.55; }
+  .result-body hr { border: none; border-top: 1px solid #e8e4de; margin: 12px 0; }
+  .result-body table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+  .result-body th { padding: 7px 11px; background: var(--bg2); font-weight: 600; font-size: 12px; text-align: left; border: 1px solid #ddd; }
+  .result-body td { padding: 7px 11px; font-size: 13px; border: 1px solid #e0ddd8; line-height: 1.6; }
   .loading-box { padding: 3rem; display: flex; flex-direction: column; align-items: center; gap: 16px; color: var(--text2); font-size: 13px; }
   .spinner { width: 30px; height: 30px; border: 2px solid var(--border2); border-top-color: var(--text2); border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -72,13 +71,11 @@
 </head>
 <body>
 <div class="app">
-
   <div class="header">
     <div class="header-badge">四柱推命 × キャリアレポート</div>
     <h1>職業適性 AI アナライザー</h1>
     <p>「お仕事占い 天命レポート」と「マイキャリアレポート」を<br>貼り付けるだけで、AIが職業適性を総合分析します</p>
   </div>
-
   <div class="steps">
     <div class="step active" id="sp0"><span class="sn">STEP 1</span>天命レポート</div>
     <div class="step" id="sp1"><span class="sn">STEP 2</span>キャリアレポート</div>
@@ -88,34 +85,30 @@
   <!-- STEP 0 -->
   <div id="s0">
     <div class="card">
-      <div class="card-title">&#9728; お仕事占い ─ 四柱推命 天命レポート</div>
+      <div class="card-title">☀ お仕事占い ─ 四柱推命 天命レポート</div>
       <div class="card-sub">メールで受け取った「天命レポート」の本文をそのまま全文貼り付けてください。</div>
-      <div class="source-badge">
-        &#128279; 占いサービス：<a href="https://shimeibo-app.vercel.app" target="_blank">shimeibo-app.vercel.app</a>
-      </div>
+      <div class="source-badge">🔗 占いサービス：<a href="https://shimeibo-app.vercel.app" target="_blank">shimeibo-app.vercel.app</a></div>
       <div class="tip"><b>こんな情報が含まれていると分析が深まります：</b><br>天命タイプ、核心的な強み、働き方の傾向、向いている仕事のフィールド、やりがいの源泉など</div>
       <button class="sample-btn" onclick="fillSample('shimei')">✦ サンプルを入力する（ひでとさんの例）</button>
-      <textarea id="shimeiTxt" rows="18" oninput="countChars('shimei')" placeholder="━━━━━━━━━━━━━━━━━━━━━━&#10;お仕事占い ─ 四柱推命 天命レポート&#10;━━━━━━━━━━━━━━━━━━━━━━&#10;&#10;...ここにメールの本文を貼り付けてください..."></textarea>
+      <textarea id="shimeiTxt" rows="18" oninput="countChars('shimei')" placeholder="ここにメールの本文を貼り付けてください..."></textarea>
       <div class="char-count" id="shimeiCount">0 文字</div>
     </div>
-    <div class="btn-row">
-      <button class="btn btn-next" onclick="toStep1()">次へ → キャリアレポートを入力</button>
-    </div>
+    <div class="btn-row"><button class="btn btn-next" onclick="toStep1()">次へ → キャリアレポートを入力</button></div>
     <div id="err0"></div>
   </div>
 
   <!-- STEP 1 -->
   <div id="s1" class="hidden">
     <div class="card">
-      <div class="card-title">&#128196; マイキャリアレポート</div>
+      <div class="card-title">📄 マイキャリアレポート</div>
       <div class="card-sub">職業興味（RIASEC）と価値観の分析アプリで生成されたレポートを全文貼り付けてください。</div>
       <button class="sample-btn" onclick="fillSample('career')">✦ サンプルを入力する</button>
       <textarea id="careerTxt" rows="22" oninput="countChars('career')" placeholder="◆ マイキャリアレポート&#10;...ここにレポート全文を貼り付けてください..."></textarea>
       <div class="char-count" id="careerCount">0 文字</div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-back" onclick="toStep0()">&#8592; 戻る</button>
-      <button class="btn btn-next" onclick="analyze()">AI で総合分析する &#8594;</button>
+      <button class="btn btn-back" onclick="toStep0()">← 戻る</button>
+      <button class="btn btn-next" onclick="analyze()">AI で総合分析する →</button>
     </div>
     <div id="err1"></div>
   </div>
@@ -124,22 +117,19 @@
   <div id="s2" class="hidden">
     <div class="result-wrap">
       <div class="result-head">
-        <div class="result-icon">&#128202;</div>
+        <div class="result-icon">📊</div>
         <div>
           <div class="result-h">総合 職業適性レポート</div>
           <div class="result-meta" id="reportDate"></div>
         </div>
       </div>
       <div id="resultBody">
-        <div class="loading-box">
-          <div class="spinner"></div>
-          <div>天命レポートとキャリアデータを統合分析しています...</div>
-        </div>
+        <div class="loading-box"><div class="spinner"></div><div>分析しています...</div></div>
       </div>
     </div>
     <!-- メール送信 -->
     <div id="emailSection" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;display:none;">
-      <div style="font-size:14px;font-weight:500;margin-bottom:4px;">    <button class="btn btn-reset" onclick="resetAll()">もう一度分析する</button>📧 分析結果をメールで受け取る</div>
+      <div style="font-size:14px;font-weight:500;margin-bottom:4px;">📧 分析結果をメールで受け取る</div>
       <div style="font-size:12px;color:var(--text2);margin-bottom:12px;">送信先のメールアドレスを入力してください</div>
       <div style="display:flex;gap:8px;">
         <input type="email" id="emailInput" placeholder="your@email.com" style="flex:1;padding:11px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;background:var(--bg);color:var(--text);outline:none;">
@@ -149,132 +139,70 @@
     </div>
     <button class="btn btn-reset" onclick="resetAll()">もう一度分析する</button>
   </div>
-
 </div>
+
 <script>
-
 function markdownToHtml(text) {
-  // 連続する空行を1行に圧縮
+  // 連続3行以上の空行を2行に圧縮
   text = text.replace(/\n{3,}/g, '\n\n');
-  // 箇条書き行間の空行を除去（AIが
-
-を挿入する問題対策）
-  text = text.replace(/(^\s*[\*\-・]\s+.+)\n\n(?=\s*[\*\-・])/gm, '$1\n');
+  // 箇条書き行どうしの間の空行を除去
+  text = text.replace(/^(\s*[-*・]\s+.+)\n\n(?=\s*[-*・]\s)/gm, '$1\n');
   // テーブル変換
-  text = text.replace(/^\|(.+)\|\n\|[-|\s:]+\|\n((?:\|.+\|\n?)*)/gm, function(match, header, rows) {
-    var thStyle = 'padding:7px 11px;background:#f2f0ec;font-weight:600;font-size:12px;text-align:left;border:1px solid #ddd;';
-    var tdStyle = 'padding:7px 11px;font-size:13px;border:1px solid #e0ddd8;line-height:1.6;';
-    var headerCells = header.split('|').map(function(s){ return s.trim(); }).filter(Boolean);
-    var headerHtml = headerCells.map(function(c){ return '<th style="'+thStyle+'">'+c+'</th>'; }).join('');
-    var rowLines = rows.trim().split('\n').filter(Boolean);
-    var rowsHtml = rowLines.map(function(row){
-      var cells = row.split('|').map(function(s){ return s.trim(); }).filter(Boolean);
-      return '<tr>'+cells.map(function(c){ return '<td style="'+tdStyle+'">'+c+'</td>'; }).join('')+'</tr>';
+  text = text.replace(/^\|(.+)\|\n\|[-|\s:]+\|\n((?:\|.+\|\n?)*)/gm, function(m, header, rows) {
+    var ths = header.split('|').map(function(s){return s.trim();}).filter(Boolean)
+      .map(function(c){return '<th>'+c+'</th>';}).join('');
+    var trs = rows.trim().split('\n').filter(Boolean).map(function(row){
+      return '<tr>'+row.split('|').map(function(s){return s.trim();}).filter(Boolean)
+        .map(function(c){return '<td>'+c+'</td>';}).join('')+'</tr>';
     }).join('');
-    return '<table style="width:100%;border-collapse:collapse;margin:10px 0;">'+
-      '<thead><tr>'+headerHtml+'</tr></thead><tbody>'+rowsHtml+'</tbody></table>';
+    return '<table><thead><tr>'+ths+'</tr></thead><tbody>'+trs+'</tbody></table>';
   });
+  // コードブロック除去
   text = text.replace(/```[\s\S]*?```/g, '');
-  text = text.replace(/^---+$/gm, '<hr style="border:none;border-top:1px solid #e8e4de;margin:12px 0;">');
-  text = text.replace(/^## ■ (.+)$/gm, '<h2 style="font-size:15px;font-weight:700;color:#1a1917;margin:20px 0 7px;padding-bottom:5px;border-bottom:2px solid #e0ddd8;">■ $1</h2>');
-  text = text.replace(/^## (.+)$/gm, '<h2 style="font-size:15px;font-weight:700;color:#1a1917;margin:20px 0 7px;padding-bottom:4px;border-bottom:1px solid #e0ddd8;">$1</h2>');
-  text = text.replace(/^■ (.+)$/gm, '<h2 style="font-size:15px;font-weight:700;color:#1a1917;margin:20px 0 7px;padding-bottom:5px;border-bottom:2px solid #e0ddd8;">■ $1</h2>');
-  text = text.replace(/^### (.+)$/gm, '<h3 style="font-size:13px;font-weight:700;color:#3a3835;margin:13px 0 4px;">$1</h3>');
-  text = text.replace(/^#### (.+)$/gm, '<h4 style="font-size:13px;font-weight:600;color:#5a5855;margin:9px 0 3px;">$1</h4>');
+  // 区切り線
+  text = text.replace(/^---+$/gm, '<hr>');
+  // 見出し
+  text = text.replace(/^## ■\s*(.+)$/gm, '<h2>■ $1</h2>');
+  text = text.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  text = text.replace(/^■\s*(.+)$/gm, '<h2>■ $1</h2>');
+  text = text.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  text = text.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
+  // 太字・斜体
   text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
-  text = text.replace(/^\s*[\*-]\s*$/gm, '');  // 空の箇条書き行を除去（インデント付きも）
-  text = text.replace(/^\d+\. (.+)$/gm, '<li style="margin:2px 0;line-height:1.55;">$1</li>');
-  text = text.replace(/^\s*[-・\*]\s+(.+)$/gm, '<li style="margin:2px 0;line-height:1.55;">$1</li>');
-  text = text.replace(/(<li[^>]*>[\s\S]*?<\/li>\n?)+/g, function(m){ return '<ul style="margin:2px 0;padding-left:18px;">'+m+'</ul>'; });
+  text = text.replace(/\*([^\s*][^*]*)\*/g, '<em>$1</em>');
+  // 空の箇条書き行を除去
+  text = text.replace(/^\s*[-*]\s*$/gm, '');
+  // 番号付きリスト
+  text = text.replace(/^\s*\d+\.\s+(.+)$/gm, '<li>$1</li>');
+  // 箇条書き（インデント含む）
+  text = text.replace(/^\s*[-*・]\s+(.+)$/gm, '<li>$1</li>');
+  // 連続するliをulで囲む
+  text = text.replace(/(<li>[\s\S]*?<\/li>\n?)+/g, function(m){
+    return '<ul>'+m+'</ul>';
+  });
+  // 段落処理
   text = text.split('\n\n').map(function(para){
     para = para.trim();
     if (!para) return '';
-    if (para.match(/^<[hHutpd]/)) return para;
-    return '<p style="margin:4px 0;line-height:1.6;">'+para.replace(/\n/g,'<br>')+'</p>';
+    if (/^<[hHutpd]/.test(para)) return para;
+    return '<p>'+para.replace(/\n/g,'<br>')+'</p>';
   }).join('\n');
   return text;
 }
 
-const SHIMEI_SAMPLE = `━━━━━━━━━━━━━━━━━━━━━━
-お仕事占い ─ 四柱推命 天命レポート
-━━━━━━━━━━━━━━━━━━━━━━
-■ お名前：ひでと
-■ 生年月日：1967年11月11日
+var SHIMEI_SAMPLE = "━━━━━━━━━━━━━━━━━━━━━━\nお仕事占い ─ 四柱推命 天命レポート\n━━━━━━━━━━━━━━━━━━━━━━\n■ お名前：ひでと\n■ 生年月日：1967年11月11日\n\n【天命タイプ】\n土の食神タイプ：豊かさを育み、喜びを分かち合う人\n\n【核心的な強み】\n創造性と人を喜ばせる才能\n\n【働き方の傾向】\nのびのびと自分の感性を活かす仕事で輝くエネルギーです。楽しみながら作ることが最大のパフォーマンスにつながります。食・芸術・表現との親和性が高い傾向があります。\n\n【向いている仕事のフィールド】\n  1. 料理人・フードクリエイター\n  2. デザイナー・アーティスト\n  3. コンテンツクリエイター\n  4. 保育士・教育者\n  5. ホスピタリティ業\n  6. 音楽家・俳優\n\n【やりがいの源泉】\n自分の作ったものや表現が人を喜ばせたとき\n\n【自己理解への問いかけ】\n「「遊び」と「仕事」が完全に一致しているとしたら、何をしていますか？」\n━━━━━━━━━━━━━━━━━━━━━━\nお仕事占い https://shimeibo-app.vercel.app\n━━━━━━━━━━━━━━━━━━━━━━";
 
-【天命タイプ】
-土の食神タイプ：豊かさを育み、喜びを分かち合う人
-
-【核心的な強み】
-創造性と人を喜ばせる才能
-
-【働き方の傾向】
-のびのびと自分の感性を活かす仕事で輝くエネルギーです。楽しみながら作ることが最大のパフォーマンスにつながります。食・芸術・表現との親和性が高い傾向があります。
-
-【向いている仕事のフィールド】
-  1. 料理人・フードクリエイター
-  2. デザイナー・アーティスト
-  3. コンテンツクリエイター
-  4. 保育士・教育者
-  5. ホスピタリティ業
-  6. 音楽家・俳優
-
-【やりがいの源泉】
-自分の作ったものや表現が人を喜ばせたとき
-
-【自己理解への問いかけ】
-「「遊び」と「仕事」が完全に一致しているとしたら、何をしていますか？」
-━━━━━━━━━━━━━━━━━━━━━━
-お仕事占い https://shimeibo-app.vercel.app
-━━━━━━━━━━━━━━━━━━━━━━`;
-
-const CAREER_SAMPLE = `◆ マイキャリアレポート 2026年4月19日
-──────────────────────────
-【1. 職業興味タイプ (RIASEC)】
-I — 研究的 (Investigative) 調べたり、分析したり、問題を解くことが好き
-スリーレターコード：IAE
-スコア（好き／嫌い）:
-  R 現実: 1点 ／ 9点
-  I 研究: 13点 ／ 1点
-  A 芸術: 13点 ／ 0点
-  S 社会: 5点 ／ 4点
-  E 企業: 7点 ／ 1点
-  C 慣習: 3点 ／ 5点
-──────────────────────────
-【AI による統合分析】
-■ 方向性
-IAE（研究的・芸術的・企業的）という特性に、「美」・「創造性」・「貢献」という価値観を掛け合わせると、単なる「仕事」ではなく「知と美を融合した社会貢献プロデュース」が適しています。
-■ キャリアステートメント
-私は、探求心と分析力を通じて物事の本質を深く理解し、その上で独自の美的センスを活かして新しい価値を創造する者です。常に「美」と「調和」が最も整った状態を追求し、固定観念にとらわれない発想で社会をより豊かにする「創造性」を発揮します。自ら率先して行動し、その活動が「世の中を美しくするための創造的な活動」として、広く「貢献」へと繋がることを目指します。
-■ おすすめ職業
-1. 建築家 — 空間の機能性と美しさを探求し、創造的なデザインを通して人々の生活や社会に貢献できる。
-2. 都市プランナー — 研究分析に基づき、未来の都市像を美的センスで描き、より良い環境創造に貢献する。
-3. クリエイティブディレクター — 調査・分析力と美的感性でプロジェクトを統括し、世の中に新たな価値と感動を届ける。
-──────────────────────────
-【2. TOP 価値観】
-No.1  美    → 最もバランスが整っている状態
-TOP3 #2  創造性    → ちえをしぼり新しく何かを創造することで豊かさが増す
-TOP3 #3  貢献    → 自分らしくありながら世の中の役に立つ
-TOP5 #4  智恵
-TOP5 #5  誠実
-──────────────────────────
-【3. キャリアの軸】
-世の中を美しくするための創造的な活動を通して世の中に貢献する
-──────────────────────────
-【4. アクション宣言】
-Action 1: （未入力）
-Action 2: （未入力）
-Action 3: （未入力）`;
+var CAREER_SAMPLE = "◆ マイキャリアレポート 2026年4月19日\n──────────────────────────\n【1. 職業興味タイプ (RIASEC)】\nI — 研究的 (Investigative) 調べたり、分析したり、問題を解くことが好き\nスリーレターコード：IAE\nスコア（好き／嫌い）:\n  R 現実: 1点 ／ 9点\n  I 研究: 13点 ／ 1点\n  A 芸術: 13点 ／ 0点\n  S 社会: 5点 ／ 4点\n  E 企業: 7点 ／ 1点\n  C 慣習: 3点 ／ 5点\n──────────────────────────\n【AI による統合分析】\n■ 方向性\nIAE（研究的・芸術的・企業的）という特性に、「美」・「創造性」・「貢献」という価値観を掛け合わせると、単なる「仕事」ではなく「知と美を融合した社会貢献プロデュース」が適しています。\n■ キャリアステートメント\n私は、探求心と分析力を通じて物事の本質を深く理解し、その上で独自の美的センスを活かして新しい価値を創造する者です。\n■ おすすめ職業\n1. 建築家 — 空間の機能性と美しさを探求し、創造的なデザインを通して人々の生活や社会に貢献できる。\n2. 都市プランナー — 研究分析に基づき、未来の都市像を美的センスで描き、より良い環境創造に貢献する。\n3. クリエイティブディレクター — 調査・分析力と美的感性でプロジェクトを統括し、世の中に新たな価値と感動を届ける。\n──────────────────────────\n【2. TOP 価値観】\nNo.1  美    → 最もバランスが整っている状態\nTOP3 #2  創造性    → ちえをしぼり新しく何かを創造することで豊かさが増す\nTOP3 #3  貢献    → 自分らしくありながら世の中の役に立つ\nTOP5 #4  智恵\nTOP5 #5  誠実\n──────────────────────────\n【3. キャリアの軸】\n世の中を美しくするための創造的な活動を通して世の中に貢献する";
 
 function fillSample(type) {
-  const id = type === 'shimei' ? 'shimeiTxt' : 'careerTxt';
-  document.getElementById(id).value = type === 'shimei' ? SHIMEI_SAMPLE : CAREER_SAMPLE;
+  document.getElementById(type === 'shimei' ? 'shimeiTxt' : 'careerTxt').value =
+    type === 'shimei' ? SHIMEI_SAMPLE : CAREER_SAMPLE;
   countChars(type);
 }
 
 function countChars(type) {
-  const id = type === 'shimei' ? 'shimeiTxt' : 'careerTxt';
-  const cid = type === 'shimei' ? 'shimeiCount' : 'careerCount';
+  var id = type === 'shimei' ? 'shimeiTxt' : 'careerTxt';
+  var cid = type === 'shimei' ? 'shimeiCount' : 'careerCount';
   document.getElementById(cid).textContent = document.getElementById(id).value.length + ' 文字';
 }
 
@@ -306,7 +234,6 @@ async function analyze() {
   }
   document.getElementById('err1').innerHTML = '';
   setStep(2);
-
   var now = new Date();
   document.getElementById('reportDate').textContent =
     now.getFullYear() + '年' + (now.getMonth()+1) + '月' + now.getDate() + '日 生成';
