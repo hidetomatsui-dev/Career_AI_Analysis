@@ -137,6 +137,16 @@
         </div>
       </div>
     </div>
+    <!-- メール送信 -->
+    <div id="emailSection" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;display:none;">
+      <div style="font-size:14px;font-weight:500;margin-bottom:4px;">    <button class="btn btn-reset" onclick="resetAll()">もう一度分析する</button>#128231; 分析結果をメールで受け取る</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:12px;">送信先のメールアドレスを入力してください</div>
+      <div style="display:flex;gap:8px;">
+        <input type="email" id="emailInput" placeholder="your@email.com" style="flex:1;padding:11px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;background:var(--bg);color:var(--text);outline:none;">
+        <button class="btn btn-next" style="flex:0 0 auto;padding:11px 20px;font-size:13px;" onclick="sendEmail()">送信</button>
+      </div>
+      <div id="emailMsg" style="margin-top:8px;font-size:12px;"></div>
+    </div>
     <button class="btn btn-reset" onclick="resetAll()">もう一度分析する</button>
   </div>
 
@@ -263,22 +273,46 @@ async function analyze() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ shimei: shimei, career: career })
     });
-    var rawText = await resp.text();
-    var data;
-    try { data = JSON.parse(rawText); }
-    catch(e) { throw new Error('サーバー生エラー: ' + rawText.slice(0, 200)); }
+    var data = await resp.json();
     if (data.error) throw new Error(data.error);
+    var resultText = data.result;
+    window._lastResult = resultText;
     document.getElementById('resultBody').innerHTML =
-      '<div class="result-body">' + data.result.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>';
+      '<div class="result-body">' + resultText.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>';
+    document.getElementById('emailSection').style.display = '';
   } catch(e) {
     document.getElementById('resultBody').innerHTML =
       '<div class="error-msg" style="margin:1.5rem">分析中にエラーが発生しました：' + e.message + '</div>';
   }
 }
 
+async function sendEmail() {
+  var to = document.getElementById('emailInput').value.trim();
+  var msgEl = document.getElementById('emailMsg');
+  if (!to) { msgEl.style.color = 'var(--danger)'; msgEl.textContent = 'メールアドレスを入力してください'; return; }
+  if (!window._lastResult) { msgEl.style.color = 'var(--danger)'; msgEl.textContent = '分析結果がありません'; return; }
+  msgEl.style.color = 'var(--text2)'; msgEl.textContent = '送信中...';
+  try {
+    var resp = await fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to: to, result: window._lastResult, subject: '職業適性 AI 分析レポート' })
+    });
+    var data = await resp.json();
+    if (data.error) throw new Error(data.error);
+    msgEl.style.color = 'var(--success)'; msgEl.textContent = '✓ ' + to + ' に送信しました';
+  } catch(e) {
+    msgEl.style.color = 'var(--danger)'; msgEl.textContent = '送信エラー：' + e.message;
+  }
+}
+
 function resetAll() {
   ['shimeiTxt','careerTxt'].forEach(function(id){ document.getElementById(id).value = ''; });
   ['shimeiCount','careerCount'].forEach(function(id){ document.getElementById(id).textContent = '0 文字'; });
+  document.getElementById('emailSection').style.display = 'none';
+  document.getElementById('emailInput').value = '';
+  document.getElementById('emailMsg').textContent = '';
+  window._lastResult = null;
   setStep(0);
 }
 </script>
