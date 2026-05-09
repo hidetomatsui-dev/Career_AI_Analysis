@@ -1,6 +1,8 @@
 export const config = { runtime: 'edge' };
 
 function markdownToHtml(text) {
+  // 連続する空行を1行に圧縮
+  text = text.replace(/\n{3,}/g, '\n\n');
   // テーブル変換（最初に処理）
   text = text.replace(/^\|(.+)\|\n\|[-|\s:]+\|\n((?:\|.+\|\n?)*)/gm, function(match, header, rows) {
     var thStyle = 'padding:8px 12px;background:#f2f0ec;font-weight:600;font-size:12px;text-align:left;border:1px solid #ddd;';
