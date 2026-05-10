@@ -142,59 +142,41 @@
 </div>
 
 <script>
-function markdownToHtml(text) {
-  // 連続3行以上の空行を2行に圧縮
-  text = text.replace(/\n{3,}/g, '\n\n');
-  // 箇条書き行どうしの間の空行を繰り返し除去
-  for (var _i = 0; _i < 5; _i++) {
-    var _prev = text;
-    text = text.replace(/([ \t]*[-*・][ \t]+[^\n]+)\n\n([ \t]*[-*・][ \t])/g, '$1\n$2');
-    if (text === _prev) break;
-  }
-  // テーブル変換
-  text = text.replace(/^\|(.+)\|\n\|[-|\s:]+\|\n((?:\|.+\|\n?)*)/gm, function(m, header, rows) {
-    var ths = header.split('|').map(function(s){return s.trim();}).filter(Boolean)
-      .map(function(c){return '<th>'+c+'</th>';}).join('');
-    var trs = rows.trim().split('\n').filter(Boolean).map(function(row){
-      return '<tr>'+row.split('|').map(function(s){return s.trim();}).filter(Boolean)
-        .map(function(c){return '<td>'+c+'</td>';}).join('')+'</tr>';
-    }).join('');
-    return '<table><thead><tr>'+ths+'</tr></thead><tbody>'+trs+'</tbody></table>';
-  });
-  // コードブロック除去
-  text = text.replace(/```[\s\S]*?```/g, '');
-  // 区切り線
-  text = text.replace(/^---+$/gm, '<hr>');
-  // 見出し
-  text = text.replace(/^## ■\s*(.+)$/gm, '<h2>■ $1</h2>');
-  text = text.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-  text = text.replace(/^■\s*(.+)$/gm, '<h2>■ $1</h2>');
-  text = text.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-  text = text.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
-  // 太字・斜体
-  text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  text = text.replace(/\*([^\s*][^*]*)\*/g, '<em>$1</em>');
-  // 空の箇条書き行を除去
-  text = text.replace(/^\s*[-*]\s*$/gm, '');
-  // 番号付きリスト
-  text = text.replace(/^\s*\d+\.\s+(.+)$/gm, '<li>$1</li>');
-  // 箇条書き（インデント含む）
-  text = text.replace(/^\s*[-*・]\s+(.+)$/gm, '<li>$1</li>');
-  // 連続するliをulで囲む
-  text = text.replace(/(<li>[\s\S]*?<\/li>\n?)+/g, function(m){
-    return '<ul>'+m+'</ul>';
-  });
-  // 隣接するulブロックを結合（空行で分離されたリストを統合）
-  text = text.replace(/<\/ul>\s*<ul>/g, '');
-  // 段落処理
-  text = text.split('\n\n').map(function(para){
-    para = para.trim();
-    if (!para) return '';
-    if (/^<[hHutpd]/.test(para)) return para;
-    return '<p>'+para.replace(/\n/g,'<br>')+'</p>';
-  }).join('\n');
-  return text;
+function formatInline(t) {
+  t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  t = t.replace(/\*([^\s*][^*]*)\*/g, '<em>$1</em>');
+  return t;
 }
+
+function markdownToHtml(text) {
+  var lines = text.split('\n');
+  var html = '';
+  var inList = false;
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i];
+    var tr = line.trim();
+    if (!tr || /^```/.test(tr)) { continue; }
+    var isBullet = /^\s*[-*・]\s+/.test(line);
+    var isNum    = /^\s*\d+\.\s+/.test(line);
+    if (isBullet || isNum) {
+      if (!inList) { html += '<ul>'; inList = true; }
+      var content = tr.replace(/^\s*[-*・]\s+/, '').replace(/^\s*\d+\.\s+/, '');
+      html += '<li>' + formatInline(content) + '</li>';
+    } else {
+      if (inList) { html += '</ul>'; inList = false; }
+      if      (/^## ■/.test(tr))  html += '<h2>■ ' + formatInline(tr.replace(/^## ■\s*/,'')) + '</h2>';
+      else if (/^## /.test(tr))   html += '<h2>' + formatInline(tr.replace(/^## /,'')) + '</h2>';
+      else if (/^■/.test(tr))     html += '<h2>' + formatInline(tr) + '</h2>';
+      else if (/^### /.test(tr))  html += '<h3>' + formatInline(tr.replace(/^### /,'')) + '</h3>';
+      else if (/^#### /.test(tr)) html += '<h4>' + formatInline(tr.replace(/^#### /,'')) + '</h4>';
+      else if (/^---+$/.test(tr)) html += '<hr>';
+      else html += '<p>' + formatInline(tr) + '</p>';
+    }
+  }
+  if (inList) html += '</ul>';
+  return html;
+}
+
 
 var SHIMEI_SAMPLE = "━━━━━━━━━━━━━━━━━━━━━━\nお仕事占い ─ 四柱推命 天命レポート\n━━━━━━━━━━━━━━━━━━━━━━\n■ お名前：ひでと\n■ 生年月日：1967年11月11日\n\n【天命タイプ】\n土の食神タイプ：豊かさを育み、喜びを分かち合う人\n\n【核心的な強み】\n創造性と人を喜ばせる才能\n\n【働き方の傾向】\nのびのびと自分の感性を活かす仕事で輝くエネルギーです。楽しみながら作ることが最大のパフォーマンスにつながります。食・芸術・表現との親和性が高い傾向があります。\n\n【向いている仕事のフィールド】\n  1. 料理人・フードクリエイター\n  2. デザイナー・アーティスト\n  3. コンテンツクリエイター\n  4. 保育士・教育者\n  5. ホスピタリティ業\n  6. 音楽家・俳優\n\n【やりがいの源泉】\n自分の作ったものや表現が人を喜ばせたとき\n\n【自己理解への問いかけ】\n「「遊び」と「仕事」が完全に一致しているとしたら、何をしていますか？」\n━━━━━━━━━━━━━━━━━━━━━━\nお仕事占い https://shimeibo-app.vercel.app\n━━━━━━━━━━━━━━━━━━━━━━";
 
