@@ -1,47 +1,66 @@
 export const config = { runtime: 'edge' };
 
+function formatInline(t) {
+  t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  t = t.replace(/\*([^\s*][^*]*)\*/g, '<em>$1</em>');
+  return t;
+}
+
 function markdownToHtml(text) {
-  text = text.replace(/\n{3,}/g, '\n\n');
-  for (var _i = 0; _i < 5; _i++) {
-    var _prev = text;
-    text = text.replace(/([ \t]*[-*・][ \t]+[^\n]+)\n\n([ \t]*[-*・][ \t])/g, '$1\n$2');
-    if (text === _prev) break;
-  }
+  var thS = 'padding:8px 12px;background:#f2f0ec;font-weight:600;font-size:12px;text-align:left;border:1px solid #ddd;';
+  var tdS = 'padding:8px 12px;font-size:13px;border:1px solid #e0ddd8;line-height:1.6;vertical-align:top;';
+  var h2S = 'font-size:15px;font-weight:700;color:#1a1917;margin:18px 0 6px;padding-bottom:5px;border-bottom:2px solid #e0ddd8;';
+  var h3S = 'font-size:13px;font-weight:700;color:#3a3835;margin:12px 0 4px;';
+  var h4S = 'font-size:13px;font-weight:600;color:#5a5855;margin:8px 0 3px;';
+  var pS  = 'margin:3px 0;line-height:1.6;font-size:13.5px;';
+  var liS = 'margin:2px 0;line-height:1.55;';
+  var ulS = 'margin:3px 0;padding-left:18px;';
+  var hrS = 'border:none;border-top:1px solid #e0ddd8;margin:14px 0;';
+
+  // テーブル変換（行ごと処理の前に実施）
   text = text.replace(/^\|(.+)\|\n\|[-|\s:]+\|\n((?:\|.+\|\n?)*)/gm, function(m, header, rows) {
-    var thS = 'padding:8px 12px;background:#f2f0ec;font-weight:600;font-size:12px;text-align:left;border:1px solid #ddd;';
-    var tdS = 'padding:8px 12px;font-size:13px;border:1px solid #e0ddd8;line-height:1.6;vertical-align:top;';
     var ths = header.split('|').map(function(s){return s.trim();}).filter(Boolean)
       .map(function(c){return '<th style="'+thS+'">'+c+'</th>';}).join('');
     var trs = rows.trim().split('\n').filter(Boolean).map(function(row){
       return '<tr>'+row.split('|').map(function(s){return s.trim();}).filter(Boolean)
         .map(function(c){return '<td style="'+tdS+'">'+c+'</td>';}).join('')+'</tr>';
     }).join('');
-    return '<table style="width:100%;border-collapse:collapse;margin:12px 0;"><thead><tr>'+ths+'</tr></thead><tbody>'+trs+'</tbody></table>';
+    return '%%%TABLE%%%<table style="width:100%;border-collapse:collapse;margin:10px 0;"><thead><tr>'+ths+'</tr></thead><tbody>'+trs+'</tbody></table>%%%ENDTABLE%%%';
   });
-  text = text.replace(/```[\s\S]*?```/g, '');
-  text = text.replace(/^---+$/gm, '<hr style="border:none;border-top:1px solid #e0ddd8;margin:14px 0;">');
-  text = text.replace(/^## ■\s*(.+)$/gm, '<h2 style="font-size:15px;font-weight:700;color:#1a1917;margin:20px 0 7px;padding-bottom:5px;border-bottom:2px solid #e0ddd8;">■ $1</h2>');
-  text = text.replace(/^## (.+)$/gm, '<h2 style="font-size:15px;font-weight:700;color:#1a1917;margin:20px 0 7px;padding-bottom:4px;border-bottom:1px solid #e0ddd8;">$1</h2>');
-  text = text.replace(/^■\s*(.+)$/gm, '<h2 style="font-size:15px;font-weight:700;color:#1a1917;margin:20px 0 7px;padding-bottom:5px;border-bottom:2px solid #e0ddd8;">■ $1</h2>');
-  text = text.replace(/^### (.+)$/gm, '<h3 style="font-size:13px;font-weight:700;color:#3a3835;margin:14px 0 4px;">$1</h3>');
-  text = text.replace(/^#### (.+)$/gm, '<h4 style="font-size:13px;font-weight:600;color:#5a5855;margin:9px 0 3px;">$1</h4>');
-  text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  text = text.replace(/\*([^\s*][^*]*)\*/g, '<em>$1</em>');
-  text = text.replace(/^\s*[-*]\s*$/gm, '');
-  text = text.replace(/^\s*\d+\.\s+(.+)$/gm, '<li style="margin:2px 0;line-height:1.55;">$1</li>');
-  text = text.replace(/^\s*[-*・]\s+(.+)$/gm, '<li style="margin:2px 0;line-height:1.55;">$1</li>');
-  text = text.replace(/(<li[^>]*>[\s\S]*?<\/li>\n?)+/g, function(m){
-    return '<ul style="margin:3px 0;padding-left:18px;">'+m+'</ul>';
-  });
-  text = text.replace(/<\/ul>\s*<ul[^>]*>/g, '');
-  text = text.split('\n\n').map(function(para){
-    para = para.trim();
-    if (!para) return '';
-    if (/^<[hHutpd]/.test(para)) return para;
-    return '<p style="margin:4px 0;line-height:1.6;">'+para.replace(/\n/g,'<br>')+'</p>';
-  }).join('\n');
-  return text;
+
+  var lines = text.split('\n');
+  var html = '';
+  var inList = false;
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i];
+    var tr = line.trim();
+    if (!tr || /^```/.test(tr)) { continue; }
+    if (/^%%%TABLE%%%/.test(tr)) { 
+      if (inList) { html += '</ul>'; inList = false; }
+      html += tr.replace(/%%%TABLE%%%|%%%ENDTABLE%%%/g, ''); 
+      continue; 
+    }
+    var isBullet = /^\s*[-*・]\s+/.test(line);
+    var isNum    = /^\s*\d+\.\s+/.test(line);
+    if (isBullet || isNum) {
+      if (!inList) { html += '<ul style="'+ulS+'">'; inList = true; }
+      var content = tr.replace(/^\s*[-*・]\s+/, '').replace(/^\s*\d+\.\s+/, '');
+      html += '<li style="'+liS+'">' + formatInline(content) + '</li>';
+    } else {
+      if (inList) { html += '</ul>'; inList = false; }
+      if      (/^## ■/.test(tr))  html += '<h2 style="'+h2S+'">■ ' + formatInline(tr.replace(/^## ■\s*/,'')) + '</h2>';
+      else if (/^## /.test(tr))   html += '<h2 style="'+h2S+'">' + formatInline(tr.replace(/^## /,'')) + '</h2>';
+      else if (/^■/.test(tr))     html += '<h2 style="'+h2S+'">' + formatInline(tr) + '</h2>';
+      else if (/^### /.test(tr))  html += '<h3 style="'+h3S+'">' + formatInline(tr.replace(/^### /,'')) + '</h3>';
+      else if (/^#### /.test(tr)) html += '<h4 style="'+h4S+'">' + formatInline(tr.replace(/^#### /,'')) + '</h4>';
+      else if (/^---+$/.test(tr)) html += '<hr style="'+hrS+'">';
+      else html += '<p style="'+pS+'">' + formatInline(tr) + '</p>';
+    }
+  }
+  if (inList) html += '</ul>';
+  return html;
 }
+
 
 export default async function handler(req) {
   if (req.method !== 'POST') {
